@@ -6,9 +6,19 @@
     <description>Recent content in Categories on Lorand&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
+    <lastBuildDate>Sun, 01 Mar 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://lorand.dev/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>web</title>
+      <link>https://lorand.dev/categories/web/</link>
+      <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://lorand.dev/categories/web/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>
