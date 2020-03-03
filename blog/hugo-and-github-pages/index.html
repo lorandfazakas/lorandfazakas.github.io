@@ -10,7 +10,7 @@
 <meta itemprop="description" content="This article will show you how to host your Hugo generated website on GitHub Pages using a custom domain">
 <meta itemprop="datePublished" content="2020-03-01T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-03-01T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="278">
+<meta itemprop="wordCount" content="280">
 <meta itemprop="image" content="https://lorand.dev/img/2020/03/hugo_and_github.jpg">
 
 
@@ -271,8 +271,8 @@ if (!doNotTrack) {
 <li><code>rm -rf public</code>to remove the public directory</li>
 <li><code>git submodule add -b master https://github.com/&lt;YOUR-GITHUB-USERNAME&gt;/&lt;YOUR-GITHUB-USERNAME&gt;.github.io.git public</code></li>
 </ol>
-<p>Now the public directory has the <strong>&lt;YOUR-GITHUB-USERNAME&gt;.github.io</strong> as the remote origin and all of the other source have the <strong>&lt;YOUR-PROJECT&gt;</strong>.
-So now to deploy your site all you have to do is generate it, cd into the public folder and finally commit &amp; push.</p>
+<p>Now the public directory has the <strong>&lt;YOUR-GITHUB-USERNAME&gt;.github.io</strong> and all of the other sources have the <strong>&lt;YOUR-PROJECT&gt;</strong> as the remote origin.
+In order to deploy your site all you have to do is generate it, cd into the public folder and finally commit &amp; push.</p>
 <h2 id="change-the-baseurl-in-your-config-file">Change the baseurl in your config file</h2>
 <p>In the config.toml file don&rsquo;t forget to change the baseurl. For example:</p>
 <pre><code>baseurl = &quot;https://&lt;MY-CUSTOM-DOMAIN&gt;.com&quot; 
@@ -288,7 +288,7 @@ So now to deploy your site all you have to do is generate it, cd into the public
 <p>Then go to the <strong>&lt;YOUR-GITHUB-USERNAME&gt;.github.io</strong> repository, open settings and in the GitHub Pages section modify the custom domain.
 If you&rsquo;re using a .dev top-level domain then make sure you check the enforce HTTPS as well.</p>
 <p>(<em>Note: HTTPS certification can take hours after registering a domain, until then you can&rsquo;t check this box)</em></p>
-<p>And that&rsquo;s it now you have a working hugo generates site hosted directly from your GitHub repository.</p>
+<p>And that&rsquo;s it. Now you have a working website hosted directly from your GitHub repository using a custom domain.</p>
   </div>
   <footer>
     <ul class="stats">
