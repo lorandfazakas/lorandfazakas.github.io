@@ -6,10 +6,28 @@
     <description>Recent content in Categories on Lorand&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 01 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 07 Mar 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://lorand.dev/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>devops</title>
+      <link>https://lorand.dev/categories/devops/</link>
+      <pubDate>Sat, 07 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://lorand.dev/categories/devops/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>IT</title>
+      <link>https://lorand.dev/categories/it/</link>
+      <pubDate>Sat, 07 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://lorand.dev/categories/it/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>web</title>
@@ -17,6 +35,15 @@
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
       
       <guid>https://lorand.dev/categories/web/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>CI/CD</title>
+      <link>https://lorand.dev/categories/ci/cd/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://lorand.dev/categories/ci/cd/</guid>
       <description></description>
     </item>
     

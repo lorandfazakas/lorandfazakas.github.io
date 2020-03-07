@@ -6,10 +6,19 @@
     <description>Recent content in Blog on Lorand&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 01 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 07 Mar 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://lorand.dev/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Book recommendation: The Phoenix Project</title>
+      <link>https://lorand.dev/blog/phoenix_project/</link>
+      <pubDate>Sat, 07 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://lorand.dev/blog/phoenix_project/</guid>
+      <description>&lt;p&gt;IT operations isn&amp;rsquo;t always a fun place to work. Murphy&amp;rsquo;s law says that &amp;quot;whatever can go wrong, will go wrong&amp;quot;. Servers will crash, applications will freeze and security vulnerabilities are everywhere.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Hugo site on a custom domain hosted by GitHub Pages</title>
@@ -17,7 +26,7 @@
       <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
       
       <guid>https://lorand.dev/blog/hugo-and-github-pages/</guid>
-      <description>&lt;p&gt;This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.&lt;/p&gt;</description>
+      <description>&lt;p&gt;This article will show you how to host your Hugo generated website on GitHub Pages using a custom domain&lt;/p&gt;</description>
     </item>
     
   </channel>

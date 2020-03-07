@@ -6,10 +6,28 @@
     <description>Recent content in Tags on Lorand&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 01 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 07 Mar 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://lorand.dev/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>book</title>
+      <link>https://lorand.dev/tags/book/</link>
+      <pubDate>Sat, 07 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://lorand.dev/tags/book/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>devops</title>
+      <link>https://lorand.dev/tags/devops/</link>
+      <pubDate>Sat, 07 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://lorand.dev/tags/devops/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>github-pages</title>
