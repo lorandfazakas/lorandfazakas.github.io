@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+<title>Go API using GRPC, REST and OpenApi - Lorand&#39;s Blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="generator" content="Hugo 0.65.2" /><meta itemprop="name" content="Go API using GRPC, REST and OpenApi">
+<meta itemprop="description" content="gRPC is an open source remote procedure call (RPC) system initially developed by Google. It uses HTTP/2 for transport and Protocol Buffers as the interface description language. It offers libraries in various languages like Go, Java, Python, Node.js etc.
+This post contains step-by-step instructions to create a ToDo service using gRPC, REST and OpenApi in Go.">
+<meta itemprop="datePublished" content="2020-03-14T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-03-14T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="1343">
+<meta itemprop="image" content="https://lorand.dev/img/2020/03/grpc_openapi.png">
+
+
+
+<meta itemprop="keywords" content="go,grpc,rest,api,openapi," /><meta property="og:title" content="Go API using GRPC, REST and OpenApi" />
+<meta property="og:description" content="gRPC is an open source remote procedure call (RPC) system initially developed by Google. It uses HTTP/2 for transport and Protocol Buffers as the interface description language. It offers libraries in various languages like Go, Java, Python, Node.js etc.
+This post contains step-by-step instructions to create a ToDo service using gRPC, REST and OpenApi in Go." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://lorand.dev/blog/grpc_and_openapi/" />
+<meta property="og:image" content="https://lorand.dev/img/2020/03/grpc_openapi.png" />
+<meta property="article:published_time" content="2020-03-14T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-03-14T00:00:00+00:00" />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://lorand.dev/img/2020/03/grpc_openapi.png"/>
+
+<meta name="twitter:title" content="Go API using GRPC, REST and OpenApi"/>
+<meta name="twitter:description" content="gRPC is an open source remote procedure call (RPC) system initially developed by Google. It uses HTTP/2 for transport and Protocol Buffers as the interface description language. It offers libraries in various languages like Go, Java, Python, Node.js etc.
+This post contains step-by-step instructions to create a ToDo service using gRPC, REST and OpenApi in Go."/>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-159562243-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<link rel="stylesheet" href="/css/bundle.min.122bf077d53f56b1f764db5a8c387dd81587f604dbf07bbf3f86a62b06e00ca9.css" integrity="sha256-Eivwd9U/VrH3ZNtajDh92BWH9gTb8Hu/P4amKwbgDKk=">
+        <link rel="stylesheet" href="/css/add-on.css">
+</head>
+
+  <body>
+    
+<header id="site-header">
+  <nav id="site-nav">
+    <h1 class="nav-title">
+      <a href="/">
+        
+          
+            Blog
+          
+        
+      </a>
+    </h1>
+    <menu id="site-nav-menu" class="flyout-menu">
+      
+        
+          
+          
+            <a href="/" class="link"><i class='fa fa-newspaper'></i> Blog</a>
+          
+        
+      
+        
+          
+          
+            <a href="/about/" class="link"><i class='far fa-id-card'></i> About</a>
+          
+        
+      
+        
+          
+          
+            <a href="/categories/" class="link"><i class='fas fa-sitemap'></i> Categories</a>
+          
+        
+      
+      <a href="#share-menu" class="share-toggle"><i class="fas fa-share-alt">&nbsp;</i>Share</a>
+      
+
+    </menu>
+    
+
+    <a href="#share-menu" class="share-toggle"><i class="fas fa-share-alt fa-2x">&nbsp;</i></a>
+    <a href="#lang-menu" class="lang-toggle" lang="en">en</a>
+    <a href="#site-nav" class="nav-toggle"><i class="fas fa-bars fa-2x"></i></a>
+  </nav>
+  <menu id="lang-menu" class="flyout-menu">
+  <a href="#" lang="en" class="link active">English (en)</a>
+  
+    
+      
+    
+  
+</menu>
+
+  
+    <menu id="share-menu" class="flyout-menu">
+      <h1>Share Post</h1>
+      
+
+
+
+
+  
+    
+    <a href="//twitter.com/share?text=Go%20API%20using%20GRPC%2c%20REST%20and%20OpenApi&amp;url=https%3a%2f%2florand.dev%2fblog%2fgrpc_and_openapi%2f" target="_blank" rel="noopener" class="share-btn twitter">
+        <i class="fab fa-twitter"></i><p>&nbsp;Twitter</p>
+      </a>
+  
+
+  
+      <a href="//www.facebook.com/sharer/sharer.php?u=https%3a%2f%2florand.dev%2fblog%2fgrpc_and_openapi%2f" target="_blank" rel="noopener" class="share-btn facebook">
+        <i class="fab fa-facebook"></i><p>&nbsp;Facebook</p>
+        </a>
+  
+
+  
+    <a href="//www.reddit.com/submit?url=https%3a%2f%2florand.dev%2fblog%2fgrpc_and_openapi%2f&amp;title=Go%20API%20using%20GRPC%2c%20REST%20and%20OpenApi" target="_blank" rel="noopener" class="share-btn reddit">
+          <i class="fab fa-reddit-alien"></i><p>&nbsp;Reddit</p>
+        </a>
+  
+
+  
+        <a href="//www.linkedin.com/shareArticle?url=https%3a%2f%2florand.dev%2fblog%2fgrpc_and_openapi%2f&amp;title=Go%20API%20using%20GRPC%2c%20REST%20and%20OpenApi" target="_blank" rel="noopener" class="share-btn linkedin">
+            <i class="fab fa-linkedin"></i><p>&nbsp;LinkedIn</p>
+          </a>
+  
+
+
+    </menu>
+  
+</header>
+
+    <div id="wrapper">
+      <section id="site-intro">
+  <a href="/"><img src="/img/main/logo.jpg" class="circle" width="" alt="Lorand Fazakas profile picture" /></a>
+  <header>
+    <h1>Lorand Fazakas</h1>
+  </header>
+  <main>
+    <p>Software Engineer</p>
+  </main>
+  
+    <footer>
+      <ul class="socnet-icons">
+        
+
+        <li><a href="//github.com/lorandfazakas" target="_blank" rel="noopener" title="GitHub" class="fab fa-github"></a></li>
+<li><a href="//gitlab.com/lorandfazakas" target="_blank" rel="noopener" title="GitLab" class="fab fa-gitlab"></a></li>
+
+
+
+
+
+
+
+
+
+
+<li><a href="//linkedin.com/in/lorand-fazakas-524771152" target="_blank" rel="noopener" title="LinkedIn" class="fab fa-linkedin"></a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </ul>
+    </footer>
+  
+</section>
+
+      <main id="site-main">
+        <article class="post">
+  <header>
+  <div class="title">
+    
+        <h2><a href="/blog/grpc_and_openapi/">Go API using GRPC, REST and OpenApi</a></h2>
+    
+    
+</div>
+  <div class="meta">
+    <time class="published" datetime="2020-03-14 00:00:00 &#43;0000 UTC">
+      March 14, 2020
+    </time>
+    <span class="author">Lorand Fazakas</span>
+    
+      <p>7 minutes read</p>
+    
+  </div>
+</header>
+
+  <section id="socnet-share">
+    
+
+
+
+
+  
+    
+    <a href="//twitter.com/share?text=Go%20API%20using%20GRPC%2c%20REST%20and%20OpenApi&amp;url=https%3a%2f%2florand.dev%2fblog%2fgrpc_and_openapi%2f" target="_blank" rel="noopener" class="share-btn twitter">
+        <i class="fab fa-twitter"></i><p>&nbsp;Twitter</p>
+      </a>
+  
+
+  
+      <a href="//www.facebook.com/sharer/sharer.php?u=https%3a%2f%2florand.dev%2fblog%2fgrpc_and_openapi%2f" target="_blank" rel="noopener" class="share-btn facebook">
+        <i class="fab fa-facebook"></i><p>&nbsp;Facebook</p>
+        </a>
+  
+
+  
+    <a href="//www.reddit.com/submit?url=https%3a%2f%2florand.dev%2fblog%2fgrpc_and_openapi%2f&amp;title=Go%20API%20using%20GRPC%2c%20REST%20and%20OpenApi" target="_blank" rel="noopener" class="share-btn reddit">
+          <i class="fab fa-reddit-alien"></i><p>&nbsp;Reddit</p>
+        </a>
+  
+
+  
+        <a href="//www.linkedin.com/shareArticle?url=https%3a%2f%2florand.dev%2fblog%2fgrpc_and_openapi%2f&amp;title=Go%20API%20using%20GRPC%2c%20REST%20and%20OpenApi" target="_blank" rel="noopener" class="share-btn linkedin">
+            <i class="fab fa-linkedin"></i><p>&nbsp;LinkedIn</p>
+          </a>
+  
+
+
+  </section>
+  
+  <a href="/blog/grpc_and_openapi/" class="image featured">
+    
+      <img src="/img/2020/03/grpc_openapi.png" alt="">
+    
+  </a>
+
+
+  <div class="content">
+    <p>gRPC is an open source remote procedure call (RPC) system initially developed by Google. It uses HTTP/2 for transport and Protocol Buffers as the interface description language. It offers libraries in various languages like Go, Java, Python, Node.js etc.</p>
+<p>This post contains step-by-step instructions to create a ToDo service using gRPC, REST and OpenApi in Go.</p>
+<h3 id="prerequisites">Prerequisites</h3>
+<ul>
+<li>Go version 1.6 or higher</li>
+<li>gRPC:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">go</span> <span style="color:#a6e22e">get</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">u</span> <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">golang</span>.<span style="color:#a6e22e">org</span><span style="color:#f92672">/</span><span style="color:#a6e22e">grpc</span></code></pre></div></li>
+<li>Protocol Buffers v3: Install the protoc compiler that is used to generate gRPC service code.
+Download the binary for your platform from here <a href="https://github.com/google/protobuf/releases">https://github.com/google/protobuf/releases</a>
+Unzip it, and add the protoc binary file to your PATH env variable.</li>
+<li>Protoc plugin for Go:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">go</span> <span style="color:#a6e22e">get</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">u</span> <span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">com</span><span style="color:#f92672">/</span><span style="color:#a6e22e">golang</span><span style="color:#f92672">/</span><span style="color:#a6e22e">protobuf</span><span style="color:#f92672">/</span><span style="color:#a6e22e">protoc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">gen</span><span style="color:#f92672">-</span><span style="color:#66d9ef">go</span></code></pre></div></li>
+<li>Install the grpc gateway:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">go</span> <span style="color:#a6e22e">get</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">u</span> <span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">com</span><span style="color:#f92672">/</span><span style="color:#a6e22e">grpc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">ecosystem</span><span style="color:#f92672">/</span><span style="color:#a6e22e">grpc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">gateway</span><span style="color:#f92672">/</span><span style="color:#a6e22e">protoc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">gen</span><span style="color:#f92672">-</span><span style="color:#a6e22e">grpc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">gateway</span>
+<span style="color:#66d9ef">go</span> <span style="color:#a6e22e">get</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">u</span> <span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">com</span><span style="color:#f92672">/</span><span style="color:#a6e22e">grpc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">ecosystem</span><span style="color:#f92672">/</span><span style="color:#a6e22e">grpc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">gateway</span><span style="color:#f92672">/</span><span style="color:#a6e22e">protoc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">gen</span><span style="color:#f92672">-</span><span style="color:#a6e22e">swagger</span>
+<span style="color:#66d9ef">go</span> <span style="color:#a6e22e">get</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">u</span> <span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">com</span><span style="color:#f92672">/</span><span style="color:#a6e22e">golang</span><span style="color:#f92672">/</span><span style="color:#a6e22e">protobuf</span><span style="color:#f92672">/</span><span style="color:#a6e22e">protoc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">gen</span><span style="color:#f92672">-</span><span style="color:#66d9ef">go</span></code></pre></div></li>
+</ul>
+<h3 id="getting-started">Getting started</h3>
+<p>First let&rsquo;s define our ToDo struct in Go:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ToDo</span> <span style="color:#66d9ef">struct</span> {
+    <span style="color:#a6e22e">ID</span> <span style="color:#66d9ef">int</span>                   <span style="color:#e6db74">`json:&#34;id&#34;`</span>
+    <span style="color:#a6e22e">Title</span> <span style="color:#66d9ef">string</span>             <span style="color:#e6db74">`json:&#34;title&#34;`</span>
+    <span style="color:#a6e22e">Description</span> <span style="color:#66d9ef">string</span>       <span style="color:#e6db74">`json:&#34;description&#34;`</span>
+    <span style="color:#a6e22e">Urgency</span> <span style="color:#66d9ef">string</span>           <span style="color:#e6db74">`json:&#34;urgency&#34;`</span>
+    <span style="color:#a6e22e">IsDone</span> <span style="color:#66d9ef">bool</span>              <span style="color:#e6db74">`json:&#34;isDone&#34;`</span>
+}</code></pre></div></p>
+<p>Operations we want to have:</p>
+<ul>
+<li>Get all the ToDos</li>
+<li>Get ToDo by ID</li>
+<li>Create a ToDo</li>
+<li>Mark a ToDo as done</li>
+</ul>
+<h3 id="define-the-service">Define the Service</h3>
+<p>In this example we will use unary RPCs and the default protocol buffers offered by Google (<a href="https://developers.google.com/protocol-buffers/docs/proto3">proto3</a>). You can find out more about other RPC options like streaming <a href="https://grpc.io/docs/guides/concepts/">here</a>.</p>
+<p>So let&rsquo;s define the service, it&rsquo;s methods and their types in a .proto file and save it as toDo.proto to a package called pb.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">pb</span>;
+
+<span style="color:#a6e22e">syntax</span> = <span style="color:#e6db74">&#34;proto3&#34;</span>;
+
+<span style="color:#a6e22e">service</span> <span style="color:#a6e22e">ToDoService</span> {
+    <span style="color:#75715e">// Get all the ToDos
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">rpc</span> <span style="color:#a6e22e">GetAllToDos</span>(<span style="color:#a6e22e">Empty</span>) <span style="color:#a6e22e">returns</span> (<span style="color:#a6e22e">ToDos</span>) {}
+
+    <span style="color:#75715e">// Get ToDo by ID
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">rpc</span> <span style="color:#a6e22e">GetToDoByID</span>(<span style="color:#a6e22e">ID</span>) <span style="color:#a6e22e">returns</span> (<span style="color:#a6e22e">ToDo</span>) {}
+
+    <span style="color:#75715e">// Create a ToDo
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">rpc</span> <span style="color:#a6e22e">CreateToDo</span>(<span style="color:#a6e22e">ToDo</span>) <span style="color:#a6e22e">returns</span> (<span style="color:#a6e22e">Empty</span>) {}
+
+    <span style="color:#75715e">// Mark as Done
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">rpc</span> <span style="color:#a6e22e">FinishToDo</span>(<span style="color:#a6e22e">ID</span>) <span style="color:#a6e22e">returns</span> (<span style="color:#a6e22e">Empty</span>) {}
+};</code></pre></div>
+<p>Next we have to define the message types those methods are using.
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">message</span> <span style="color:#a6e22e">ToDo</span> {
+    <span style="color:#66d9ef">int32</span> <span style="color:#a6e22e">id</span> = <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">string</span> <span style="color:#a6e22e">title</span> = <span style="color:#ae81ff">2</span>;
+    <span style="color:#66d9ef">string</span> <span style="color:#a6e22e">description</span> = <span style="color:#ae81ff">3</span>;
+    <span style="color:#a6e22e">enum</span> <span style="color:#a6e22e">ToDoUrgency</span> {
+        <span style="color:#a6e22e">low</span> = <span style="color:#ae81ff">0</span>;
+        <span style="color:#a6e22e">normal</span> = <span style="color:#ae81ff">1</span>;
+        <span style="color:#a6e22e">critical</span> = <span style="color:#ae81ff">2</span>;
+    }
+    <span style="color:#a6e22e">ToDoUrgency</span> <span style="color:#a6e22e">urgency</span> = <span style="color:#ae81ff">4</span>;
+    <span style="color:#66d9ef">bool</span> <span style="color:#a6e22e">isDone</span> = <span style="color:#ae81ff">5</span>;
+};
+
+<span style="color:#a6e22e">message</span> <span style="color:#a6e22e">ToDos</span> {
+    <span style="color:#a6e22e">repeated</span> <span style="color:#a6e22e">ToDo</span> <span style="color:#a6e22e">toDo</span> = <span style="color:#ae81ff">1</span>;
+};
+
+<span style="color:#a6e22e">message</span> <span style="color:#a6e22e">ID</span> {
+    <span style="color:#66d9ef">int32</span> <span style="color:#a6e22e">id</span> = <span style="color:#ae81ff">1</span>;
+};
+
+<span style="color:#a6e22e">message</span> <span style="color:#a6e22e">Empty</span> {
+};</code></pre></div></p>
+<h2 id="generating-the-server-and-client-code">Generating the Server and Client Code</h2>
+<p>You&rsquo;re all set to generate the required Go code using protoc. Change the active directory to pb and execute the following.
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">protoc</span> <span style="color:#f92672">--</span><span style="color:#a6e22e">go_out</span>=<span style="color:#a6e22e">plugins</span>=<span style="color:#a6e22e">grpc</span>:. <span style="color:#a6e22e">toDo</span>.<span style="color:#a6e22e">proto</span></code></pre></div></p>
+<p>This will generate a file called toDo.pb.go</p>
+<h2 id="lets-create-a-datasource-for-our-todos">Let&rsquo;s create a datasource for our ToDos</h2>
+<p>In this example we will use an in-memory data source which will be populated from a JSON file for some initial test data.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ToDos</span> <span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">ToDos</span>
+
+<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ToDo</span> <span style="color:#66d9ef">struct</span> {
+	<span style="color:#a6e22e">ID</span>          <span style="color:#66d9ef">int</span>    <span style="color:#e6db74">`json:&#34;id&#34;`</span>
+	<span style="color:#a6e22e">Title</span>       <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;title&#34;`</span>
+	<span style="color:#a6e22e">Description</span> <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;description&#34;`</span>
+	<span style="color:#a6e22e">Urgency</span>     <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;urgency&#34;`</span>
+	<span style="color:#a6e22e">IsDone</span>      <span style="color:#66d9ef">bool</span>   <span style="color:#e6db74">`json:&#34;isDone&#34;`</span>
+}
+
+<span style="color:#75715e">// ReadJson reads the data.json for initial ToDos
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">ReadJson</span>() {
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">toDos</span> []<span style="color:#a6e22e">ToDo</span>
+	<span style="color:#a6e22e">dataFile</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ioutil</span>.<span style="color:#a6e22e">ReadFile</span>(<span style="color:#e6db74">&#34;testdata/data.json&#34;</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;error reading data file: &#34;</span>, <span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">json</span>.<span style="color:#a6e22e">Unmarshal</span>(<span style="color:#a6e22e">dataFile</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">toDos</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;error parsing data file &#34;</span>, <span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">t</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">toDos</span> {
+		<span style="color:#a6e22e">ToDo</span> <span style="color:#f92672">:=</span> new(<span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">ToDo</span>)
+		<span style="color:#a6e22e">ToDo</span>.<span style="color:#a6e22e">Id</span> = int32(<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">ID</span>)
+		<span style="color:#a6e22e">ToDo</span>.<span style="color:#a6e22e">Title</span> = <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Title</span>
+		<span style="color:#a6e22e">ToDo</span>.<span style="color:#a6e22e">Description</span> = <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Description</span>
+		<span style="color:#a6e22e">ToDo</span>.<span style="color:#a6e22e">Urgency</span> = <span style="color:#a6e22e">getUrgencyType</span>(<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Urgency</span>)
+		<span style="color:#a6e22e">ToDo</span>.<span style="color:#a6e22e">IsDone</span> = <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">IsDone</span>
+		<span style="color:#a6e22e">ToDos</span>.<span style="color:#a6e22e">ToDo</span> = append(<span style="color:#a6e22e">ToDos</span>.<span style="color:#a6e22e">ToDo</span>, <span style="color:#a6e22e">ToDo</span>)
+	}
+}
+
+<span style="color:#75715e">// GetAllToDos returns all ToDos
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">GetAllToDos</span>() (<span style="color:#a6e22e">list</span> <span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">ToDos</span>) {
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ToDos</span>
+}
+
+<span style="color:#75715e">// GetToDoByID returns single ToDo by id
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">GetToDoByID</span>(<span style="color:#a6e22e">id</span> <span style="color:#66d9ef">int32</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">ToDo</span> {
+	<span style="color:#a6e22e">toDo</span> <span style="color:#f92672">:=</span> new(<span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">ToDo</span>)
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">res</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">ToDos</span>.<span style="color:#a6e22e">ToDo</span> {
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">Id</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">id</span> {
+			<span style="color:#a6e22e">toDo</span> = <span style="color:#a6e22e">res</span>
+		}
+	}
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">toDo</span>
+}
+
+<span style="color:#75715e">// CreateToDo creates a ToDo
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">CreateToDo</span>(<span style="color:#a6e22e">t</span> <span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">ToDo</span>) {
+	<span style="color:#a6e22e">ToDos</span>.<span style="color:#a6e22e">ToDo</span> = append(<span style="color:#a6e22e">ToDos</span>.<span style="color:#a6e22e">ToDo</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">t</span>)
+}
+
+<span style="color:#75715e">// FinishToDo marks a ToDo as done
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">FinishToDo</span>(<span style="color:#a6e22e">id</span> <span style="color:#66d9ef">int32</span>) {
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">res</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">ToDos</span>.<span style="color:#a6e22e">ToDo</span> {
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">Id</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">id</span> {
+			<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">IsDone</span> = <span style="color:#66d9ef">true</span>
+		}
+	}
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">getUrgencyType</span>(<span style="color:#a6e22e">s</span> <span style="color:#66d9ef">string</span>) <span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">ToDo_ToDoUrgency</span> {
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ret</span> <span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">ToDo_ToDoUrgency</span>
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">v</span>, <span style="color:#a6e22e">k</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">ToDo_ToDoUrgency_value</span> {
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">s</span> {
+			<span style="color:#a6e22e">ret</span> = <span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">ToDo_ToDoUrgency</span>(<span style="color:#a6e22e">k</span>)
+			<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ret</span>
+		}
+	}
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ret</span>
+}</code></pre></div>
+<h2 id="implementing-the-services-and-creating-the-server">Implementing the services and creating the server</h2>
+<p>Next let&rsquo;s implement the service.
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// ToDoService implements the available services for todos
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ToDoService</span> <span style="color:#66d9ef">struct</span>{}
+
+<span style="color:#75715e">// GetAllToDos returns all the ToDos
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">s</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">ToDoService</span>) <span style="color:#a6e22e">GetAllToDos</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">req</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">Empty</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">ToDos</span>, <span style="color:#66d9ef">error</span>) {
+	<span style="color:#a6e22e">toDos</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">store</span>.<span style="color:#a6e22e">GetAllToDos</span>()
+	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;GetAllToDos called&#34;</span>)
+	<span style="color:#66d9ef">return</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">toDos</span>, <span style="color:#66d9ef">nil</span>
+}
+
+<span style="color:#75715e">// GetToDoByID returns a ToDo by ID
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">s</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">ToDoService</span>) <span style="color:#a6e22e">GetToDoByID</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">id</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">ID</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">ToDo</span>, <span style="color:#66d9ef">error</span>) {
+	<span style="color:#a6e22e">toDo</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">store</span>.<span style="color:#a6e22e">GetToDoByID</span>(<span style="color:#a6e22e">id</span>.<span style="color:#a6e22e">Id</span>)
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">toDo</span>, <span style="color:#66d9ef">nil</span>
+}
+
+<span style="color:#75715e">// CreateToDo creates a new ToDo
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">s</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">ToDoService</span>) <span style="color:#a6e22e">CreateToDo</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">toDo</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">ToDo</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">Empty</span>, <span style="color:#66d9ef">error</span>) {
+	<span style="color:#a6e22e">store</span>.<span style="color:#a6e22e">CreateToDo</span>(<span style="color:#f92672">*</span><span style="color:#a6e22e">toDo</span>)
+	<span style="color:#66d9ef">return</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">Empty</span>{}, <span style="color:#66d9ef">nil</span>
+}
+
+<span style="color:#75715e">// FinishToDo marks a ToDo as done
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">s</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">ToDoService</span>) <span style="color:#a6e22e">FinishToDo</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">id</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">ID</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">Empty</span>, <span style="color:#66d9ef">error</span>) {
+	<span style="color:#a6e22e">store</span>.<span style="color:#a6e22e">FinishToDo</span>(<span style="color:#a6e22e">id</span>.<span style="color:#a6e22e">Id</span>)
+	<span style="color:#66d9ef">return</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">Empty</span>{}, <span style="color:#66d9ef">nil</span>
+}</code></pre></div></p>
+<p>Then create the gRPC server using port 10000:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">    <span style="color:#a6e22e">grpcPort</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">&#34;:10000&#34;</span>
+
+	<span style="color:#a6e22e">store</span>.<span style="color:#a6e22e">ReadJson</span>()
+	<span style="color:#75715e">// start listening for grpc
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">listen</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">net</span>.<span style="color:#a6e22e">Listen</span>(<span style="color:#e6db74">&#34;tcp&#34;</span>, <span style="color:#a6e22e">grpcPort</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#75715e">// Create new grpc server
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">server</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">grpc</span>.<span style="color:#a6e22e">NewServer</span>()
+	<span style="color:#75715e">// Register service
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">RegisterToDoServiceServer</span>(<span style="color:#a6e22e">server</span>, new(<span style="color:#a6e22e">ToDoService</span>))
+	<span style="color:#75715e">// Start serving requests
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Starting grpc server on port &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">grpcPort</span>)
+
+	<span style="color:#a6e22e">server</span>.<span style="color:#a6e22e">Serve</span>(<span style="color:#a6e22e">listen</span>)</code></pre></div></p>
+<h2 id="creating-the-client">Creating the client</h2>
+<p>For testing purposes let&rsquo;s create a client which will get the list of ToDos.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">empty</span> <span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">Empty</span>
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">serverAddr</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">&#34;:10000&#34;</span>
+	<span style="color:#a6e22e">conn</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">grpc</span>.<span style="color:#a6e22e">Dial</span>(<span style="color:#a6e22e">serverAddr</span>, <span style="color:#a6e22e">grpc</span>.<span style="color:#a6e22e">WithInsecure</span>())
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;error connecting: &#34;</span>, <span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">conn</span>.<span style="color:#a6e22e">Close</span>()
+	<span style="color:#a6e22e">client</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">NewToDoServiceClient</span>(<span style="color:#a6e22e">conn</span>)
+	<span style="color:#a6e22e">toDos</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">client</span>.<span style="color:#a6e22e">GetAllToDos</span>(<span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>(), <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">empty</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;error in grpc call:&#34;</span>, <span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">t</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">toDos</span>.<span style="color:#a6e22e">ToDo</span> {
+		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">t</span>)
+	}
+
+}</code></pre></div>
+<p>Then test the server and client app:</p>
+<p>Start the server:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">go</span> <span style="color:#a6e22e">run</span> <span style="color:#a6e22e">server</span><span style="color:#f92672">/</span><span style="color:#a6e22e">server</span>.<span style="color:#66d9ef">go</span></code></pre></div></p>
+<p>Start the client
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">go</span> <span style="color:#a6e22e">run</span> <span style="color:#a6e22e">client</span><span style="color:#f92672">/</span><span style="color:#a6e22e">client</span>.<span style="color:#66d9ef">go</span></code></pre></div></p>
+<p>The output should be something like this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">id</span>:<span style="color:#ae81ff">1</span> <span style="color:#a6e22e">title</span>:<span style="color:#e6db74">&#34;Clean the Kitchen&#34;</span> <span style="color:#a6e22e">description</span>:<span style="color:#e6db74">&#34;Wash the dishes, mop the floor, wipe the table&#34;</span>
+<span style="color:#a6e22e">id</span>:<span style="color:#ae81ff">2</span> <span style="color:#a6e22e">title</span>:<span style="color:#e6db74">&#34;Write gRPC application&#34;</span> <span style="color:#a6e22e">description</span>:<span style="color:#e6db74">&#34;Define the proto buffers, create data source and implement server code&#34;</span> <span style="color:#a6e22e">urgency</span>:<span style="color:#a6e22e">normal</span>
+<span style="color:#a6e22e">id</span>:<span style="color:#ae81ff">3</span> <span style="color:#a6e22e">title</span>:<span style="color:#e6db74">&#34;Workout&#34;</span> <span style="color:#a6e22e">description</span>:<span style="color:#e6db74">&#34;Bench press, push-ups, dumbbell&#34;</span> <span style="color:#a6e22e">urgency</span>:<span style="color:#a6e22e">critical</span></code></pre></div>
+<p>At this point we have a working gRPC server and client application. But how can we offer the same API through REST? Let&rsquo;s jump into it.</p>
+<h2 id="adding-rest-api">ADDING REST API</h2>
+<p>We will be using grpc-gateway. This will act as a proxy between our gRPC server and a REST client.</p>
+<p>First we have to import the google/api/annotations.proto package and add the service endpoints to our proto file.
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;google/api/annotations.proto&#34;</span>;
+
+<span style="color:#a6e22e">service</span> <span style="color:#a6e22e">ToDoService</span> {
+    <span style="color:#75715e">// Get all the ToDos
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">rpc</span> <span style="color:#a6e22e">GetAllToDos</span>(<span style="color:#a6e22e">Empty</span>) <span style="color:#a6e22e">returns</span> (<span style="color:#a6e22e">ToDos</span>) {
+        <span style="color:#a6e22e">option</span> (<span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">api</span>.<span style="color:#a6e22e">http</span>) = {
+            <span style="color:#a6e22e">get</span>: <span style="color:#e6db74">&#34;/api/v1/todos&#34;</span>
+        };
+    }
+    
+    <span style="color:#75715e">// Get ToDo by ID
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">rpc</span> <span style="color:#a6e22e">GetToDoByID</span>(<span style="color:#a6e22e">ID</span>) <span style="color:#a6e22e">returns</span> (<span style="color:#a6e22e">ToDo</span>) {
+        <span style="color:#a6e22e">option</span> (<span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">api</span>.<span style="color:#a6e22e">http</span>) = {
+            <span style="color:#a6e22e">get</span>: <span style="color:#e6db74">&#34;/api/v1/todos/{id}&#34;</span>
+        };
+    }
+
+    <span style="color:#75715e">// Create a ToDo
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">rpc</span> <span style="color:#a6e22e">CreateToDo</span>(<span style="color:#a6e22e">ToDo</span>) <span style="color:#a6e22e">returns</span> (<span style="color:#a6e22e">Empty</span>) {
+        <span style="color:#a6e22e">option</span> (<span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">api</span>.<span style="color:#a6e22e">http</span>) = {
+            <span style="color:#a6e22e">post</span>: <span style="color:#e6db74">&#34;/api/v1/todos&#34;</span>
+            <span style="color:#a6e22e">body</span>: <span style="color:#e6db74">&#34;*&#34;</span>
+        };
+    }
+
+    <span style="color:#75715e">// Mark as Done
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">rpc</span> <span style="color:#a6e22e">FinishToDo</span>(<span style="color:#a6e22e">ID</span>) <span style="color:#a6e22e">returns</span> (<span style="color:#a6e22e">Empty</span>) {
+        <span style="color:#a6e22e">option</span> (<span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">api</span>.<span style="color:#a6e22e">http</span>) = {
+            <span style="color:#a6e22e">post</span>: <span style="color:#e6db74">&#34;/api/v1/todos/finish&#34;</span>
+            <span style="color:#a6e22e">body</span>: <span style="color:#e6db74">&#34;*&#34;</span>
+        };
+    }
+}</code></pre></div></p>
+<p>Then lets run the following command to generate the REST gateway:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">protoc</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">I</span>. <span style="color:#f92672">-</span><span style="color:#a6e22e">I</span><span style="color:#960050;background-color:#1e0010">$</span><span style="color:#a6e22e">GOPATH</span><span style="color:#f92672">/</span><span style="color:#a6e22e">src</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">I</span><span style="color:#960050;background-color:#1e0010">$</span><span style="color:#a6e22e">GOPATH</span><span style="color:#f92672">/</span><span style="color:#a6e22e">src</span><span style="color:#f92672">/</span><span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">com</span><span style="color:#f92672">/</span><span style="color:#a6e22e">grpc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">ecosystem</span><span style="color:#f92672">/</span><span style="color:#a6e22e">grpc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">gateway</span><span style="color:#f92672">/</span><span style="color:#a6e22e">third_party</span><span style="color:#f92672">/</span><span style="color:#a6e22e">googleapis</span> <span style="color:#f92672">--</span><span style="color:#a6e22e">grpc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">gateway_out</span>=<span style="color:#a6e22e">logtostderr</span>=<span style="color:#66d9ef">true</span>:. <span style="color:#a6e22e">toDo</span>.<span style="color:#a6e22e">proto</span></code></pre></div></p>
+<h2 id="generate-the-openapi-documentation">Generate the openAPI documentation</h2>
+<p>To put the icing on top we want to generate and OpenApi (formerly know as Swagger) documentation for our REST API.
+To do that we need to modify our proto file again.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;protoc-gen-swagger/options/annotations.proto&#34;</span>;
+
+<span style="color:#a6e22e">option</span> (<span style="color:#a6e22e">grpc</span>.<span style="color:#a6e22e">gateway</span>.<span style="color:#a6e22e">protoc_gen_swagger</span>.<span style="color:#a6e22e">options</span>.<span style="color:#a6e22e">openapiv2_swagger</span>) = {
+    <span style="color:#a6e22e">info</span>: {
+      <span style="color:#a6e22e">title</span>: <span style="color:#e6db74">&#34;grpc-rest-openapi-demo&#34;</span>;
+      <span style="color:#a6e22e">version</span>: <span style="color:#e6db74">&#34;1.0&#34;</span>;
+      <span style="color:#a6e22e">contact</span>: {
+        <span style="color:#a6e22e">name</span>: <span style="color:#e6db74">&#34;Lorand Fazakas&#34;</span>;
+        <span style="color:#a6e22e">url</span>: <span style="color:#e6db74">&#34;https://github.com/lorandfazakas/grpc-rest-openapi-demo&#34;</span>;
+        <span style="color:#a6e22e">email</span>: <span style="color:#e6db74">&#34;example@example.com&#34;</span>;
+      };
+    };
+    <span style="color:#a6e22e">schemes</span>: <span style="color:#a6e22e">HTTP</span>;
+    <span style="color:#a6e22e">schemes</span>: <span style="color:#a6e22e">HTTPS</span>;
+    <span style="color:#a6e22e">consumes</span>: <span style="color:#e6db74">&#34;application/json&#34;</span>;
+    <span style="color:#a6e22e">produces</span>: <span style="color:#e6db74">&#34;application/json&#34;</span>;
+};</code></pre></div>
+<p>The following script will generate the OpenAPI doc as a JSON file (<em>toDo.swagger.json</em>):</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">protoc</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">I</span>. <span style="color:#f92672">-</span><span style="color:#a6e22e">I</span><span style="color:#960050;background-color:#1e0010">$</span><span style="color:#a6e22e">GOPATH</span><span style="color:#f92672">/</span><span style="color:#a6e22e">src</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">I</span><span style="color:#960050;background-color:#1e0010">$</span><span style="color:#a6e22e">GOPATH</span><span style="color:#f92672">/</span><span style="color:#a6e22e">src</span><span style="color:#f92672">/</span><span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">com</span><span style="color:#f92672">/</span><span style="color:#a6e22e">grpc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">ecosystem</span><span style="color:#f92672">/</span><span style="color:#a6e22e">grpc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">gateway</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">I</span><span style="color:#960050;background-color:#1e0010">$</span><span style="color:#a6e22e">GOPATH</span><span style="color:#f92672">/</span><span style="color:#a6e22e">src</span><span style="color:#f92672">/</span><span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">com</span><span style="color:#f92672">/</span><span style="color:#a6e22e">grpc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">ecosystem</span><span style="color:#f92672">/</span><span style="color:#a6e22e">grpc</span><span style="color:#f92672">-</span><span style="color:#a6e22e">gateway</span><span style="color:#f92672">/</span><span style="color:#a6e22e">third_party</span><span style="color:#f92672">/</span><span style="color:#a6e22e">googleapis</span>  <span style="color:#f92672">--</span><span style="color:#a6e22e">swagger_out</span>=<span style="color:#a6e22e">logtostderr</span>=<span style="color:#66d9ef">true</span>:. <span style="color:#a6e22e">toDo</span>.<span style="color:#a6e22e">proto</span></code></pre></div>
+<ul>
+<li>
+<p>Download SwaggerUI from their <a href="https://github.com/swagger-api/swagger-ui">GitHub Repo</a></p>
+</li>
+<li>
+<p>Once downloaded, place the content of <strong>dist</strong> into a folder named swaggerui.</p>
+</li>
+<li>
+<p>Copy the JSON file generated in the previous step into this folder and finally change the index.html url to ./toDo.swagger.json</p>
+</li>
+<li>
+<p>Serve the HTTP server
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">ctx</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>()
+<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">cancel</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">WithCancel</span>(<span style="color:#a6e22e">ctx</span>)
+<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">cancel</span>()
+
+<span style="color:#a6e22e">gw</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">runtime</span>.<span style="color:#a6e22e">NewServeMux</span>()
+<span style="color:#a6e22e">opts</span> <span style="color:#f92672">:=</span> []<span style="color:#a6e22e">grpc</span>.<span style="color:#a6e22e">DialOption</span>{<span style="color:#a6e22e">grpc</span>.<span style="color:#a6e22e">WithInsecure</span>()}
+<span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">RegisterToDoServiceHandlerFromEndpoint</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">gw</span>, <span style="color:#e6db74">&#34;localhost&#34;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">grpcPort</span>, <span style="color:#a6e22e">opts</span>)
+<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">err</span>
+}
+<span style="color:#a6e22e">mux</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">NewServeMux</span>()
+<span style="color:#a6e22e">mux</span>.<span style="color:#a6e22e">Handle</span>(<span style="color:#e6db74">&#34;/api/&#34;</span>, <span style="color:#a6e22e">gw</span>)
+
+<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#a6e22e">httpPort</span>, <span style="color:#a6e22e">mux</span>)</code></pre></div></p>
+</li>
+<li>
+<p>Serve the swagger UI
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">fs</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">FileServer</span>(<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Dir</span>(<span style="color:#e6db74">&#34;./swaggerui&#34;</span>))
+<span style="color:#a6e22e">mux</span>.<span style="color:#a6e22e">Handle</span>(<span style="color:#e6db74">&#34;/swaggerui/&#34;</span>, <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">StripPrefix</span>(<span style="color:#e6db74">&#34;/swaggerui/&#34;</span>, <span style="color:#a6e22e">fs</span>))</code></pre></div></p>
+</li>
+</ul>
+<p>If you go to <a href="http://localhost:10001/swaggerui">localhost:10001/swaggerui</a> you should see something like this:</p>
+<p><img src="/img/2020/03/swaggerui.png" alt="alt text" title="Swagger UI"></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>I hope you liked this tutorial how to set up a gRPC and REST API with Go.</p>
+<p>You can find the source code <a href="https://github.com/lorandfazakas/grpc-rest-openapi-demo">here</a>.</p>
+<p>Also If you would like to know more about gRPC I suggest the official documentation <a href="https://grpc.io/docs/">grpc.io</a> and <a href="https://github.com/grpc-ecosystem/awesome-grpc#lang-go">this curated list</a> of libraries for Go.</p>
+  </div>
+  <footer>
+    <ul class="stats">
+  
+    
+    
+      <li class="categories">
+        <ul>
+          
+            
+            <li><a class="article-category-link" href="https://lorand.dev/categories/go">go</a></li>
+          
+            
+            <li><a class="article-category-link" href="https://lorand.dev/categories/dev">dev</a></li>
+          
+        </ul>
+      </li>
+    
+  
+  
+    
+    
+      <li class="tags">
+        <ul>
+          
+            
+            <li><a class="article-category-link" href="https://lorand.dev/tags/go">go</a></li>
+          
+            
+            <li><a class="article-category-link" href="https://lorand.dev/tags/grpc">grpc</a></li>
+          
+            
+            <li><a class="article-category-link" href="https://lorand.dev/tags/rest">rest</a></li>
+          
+            
+            <li><a class="article-category-link" href="https://lorand.dev/tags/api">api</a></li>
+          
+            
+            <li><a class="article-category-link" href="https://lorand.dev/tags/openapi">openapi</a></li>
+          
+        </ul>
+      </li>
+    
+  
+</ul>
+
+  </footer>
+</article>
+
+    <article class="post">
+        <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "lorand-dev" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </article>
+
+
+
+
+<div class="pagination">
+  
+    <a href="/blog/phoenix_project/" class="button"><div class="previous"><div>Book recommendation: The Phoenix Project</div></div></a>
+  
+  
+</div>
+
+
+      </main>
+      <section id="site-sidebar">
+  
+    <section id="recent-posts">
+      <header>
+        <h1>Recent posts</h1>
+      </header>
+      
+      <article class="mini-post">
+        <section>
+          
+  <a href="/blog/grpc_and_openapi/" class="image featured">
+    
+      <img src="/img/2020/03/grpc_openapi.png" alt="">
+    
+  </a>
+
+
+        </section>
+        <header>
+          <h1><a href="/blog/grpc_and_openapi/">Go API using GRPC, REST and OpenApi</a></h1>
+          <time class="published" datetime="">March 14, 2020</time>
+        </header>
+      </article>
+      
+      <article class="mini-post">
+        <section>
+          
+  <a href="/blog/phoenix_project/" class="image featured">
+    
+      <img src="/img/2020/03/phoenix_project.png" alt="">
+    
+  </a>
+
+
+        </section>
+        <header>
+          <h1><a href="/blog/phoenix_project/">Book recommendation: The Phoenix Project</a></h1>
+          <time class="published" datetime="">March 7, 2020</time>
+        </header>
+      </article>
+      
+      <article class="mini-post">
+        <section>
+          
+  <a href="/blog/hugo-and-github-pages/" class="image featured">
+    
+      <img src="/img/2020/03/hugo_and_github.jpg" alt="">
+    
+  </a>
+
+
+        </section>
+        <header>
+          <h1><a href="/blog/hugo-and-github-pages/">Hugo site on a custom domain hosted by GitHub Pages</a></h1>
+          <time class="published" datetime="">March 1, 2020</time>
+        </header>
+      </article>
+      
+      
+    </section>
+  
+
+  
+    
+      <section id="categories">
+        <header>
+          <h1><a href="/categories">Categories</a></h1>
+        </header>
+        <ul>
+          
+            
+          
+          
+          <li>
+            
+              <a href="/categories/ci/cd/">ci/cd<span class="count">1</span></a>
+            
+          
+          <li>
+            
+              <a href="/categories/dev/">dev<span class="count">1</span></a>
+            
+          
+          <li>
+            
+              <a href="/categories/devops/">devops<span class="count">1</span></a>
+            
+          
+          <li>
+            
+              <a href="/categories/go/">go<span class="count">1</span></a>
+            
+          
+          <li>
+            
+              <a href="/categories/it/">it<span class="count">1</span></a>
+            
+          
+          <li>
+            
+              <a href="/categories/web/">web<span class="count">1</span></a>
+            
+          
+          </li>
+        </ul>
+      </section>
+    
+  
+
+  
+</section>
+
+      <footer id="site-footer">
+  
+      <ul class="socnet-icons">
+        
+
+        <li><a href="//github.com/lorandfazakas" target="_blank" rel="noopener" title="GitHub" class="fab fa-github"></a></li>
+<li><a href="//gitlab.com/lorandfazakas" target="_blank" rel="noopener" title="GitLab" class="fab fa-gitlab"></a></li>
+
+
+
+
+
+
+
+
+
+
+<li><a href="//linkedin.com/in/lorand-fazakas-524771152" target="_blank" rel="noopener" title="LinkedIn" class="fab fa-linkedin"></a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </ul>
+  
+  <p class="copyright">
+    
+      &copy; 2020
+      
+        Lorand&#39;s Blog
+      
+    . <br>
+    Theme: <a href='https://github.com/pacollins/hugo-future-imperfect-slim' target='_blank' rel='noopener'>Hugo Future Imperfect Slim</a><br>A <a href='https://html5up.net/future-imperfect' target='_blank' rel='noopener'>HTML5 UP port</a> | Powered by <a href='https://gohugo.io/' title='0.65.2' target='_blank' rel='noopener'>Hugo</a>
+  </p>
+</footer>
+<a id="back-to-top" href="#" class="fas fa-arrow-up fa-2x"></a>
+
+      <script src="/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script><script src="/js/bundle.min.e0c399b948d3cf5c3a5e3badb94023d0b064a19ac39fd8cd79fb9f57fa4d1091.js" integrity="sha256-4MOZuUjTz1w6XjutuUAj0LBkoZrDn9jNefufV/pNEJE="></script>
+    <script src="/js/add-on.js"></script>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-159562243-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+    </div>
+  </body>
+</html>

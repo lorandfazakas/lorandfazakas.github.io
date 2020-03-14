@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>openapi on Lorand&#39;s Blog</title>
+    <link>https://lorand.dev/tags/openapi/</link>
+    <description>Recent content in openapi on Lorand&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 14 Mar 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://lorand.dev/tags/openapi/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Go API using GRPC, REST and OpenApi</title>
+      <link>https://lorand.dev/blog/grpc_and_openapi/</link>
+      <pubDate>Sat, 14 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://lorand.dev/blog/grpc_and_openapi/</guid>
+      <description>&lt;p&gt;gRPC is an open source remote procedure call (RPC) system initially developed by Google. It uses HTTP/2 for transport and Protocol Buffers as the interface description language. It offers libraries in various languages like Go, Java, Python, Node.js etc.&lt;/p&gt;
+&lt;p&gt;This post contains step-by-step instructions to create a ToDo service using gRPC, REST and OpenApi in Go.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
